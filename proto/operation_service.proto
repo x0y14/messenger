@@ -1,0 +1,18 @@
+syntax = "proto3";
+package operation_service;
+import "types.proto";
+
+
+// operationをとってくる
+// fetchOps
+message FetchOpsRequest {
+  int64 originRevision = 1;
+}
+message FetchOpsReply {
+  types.Operation op = 1;
+}
+
+
+service OperationService {
+  rpc FetchOps(FetchOpsRequest) returns (stream FetchOpsReply) {};
+}
