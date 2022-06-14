@@ -61,7 +61,7 @@ enum OpType {
 
 message Operation {
   int64 id = 1;
-  OpType type = 2;
+  OpType opType = 2;
   string source = 3;
   repeated string dest = 4;
 }
