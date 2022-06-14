@@ -14,5 +14,7 @@ message FetchOpsReply {
 
 
 service OperationService {
+  rpc Ping(types.PingRequest) returns (types.PingReply) {};
+
   rpc FetchOps(FetchOpsRequest) returns (stream FetchOpsReply) {};
 }
