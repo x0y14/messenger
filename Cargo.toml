@@ -1,5 +1,6 @@
 [workspace]
 members = [
     "talk",
-    "op"
+    "op",
+    "idgen",
 ]
