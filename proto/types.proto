@@ -1,0 +1,67 @@
+syntax = "proto3";
+package types;
+
+// share
+message PingRequest {}
+message PingReply  {
+  string message = 1;
+}
+
+
+// account service
+message Account {
+  string id = 1;
+  string email = 2;
+  string username = 3;
+
+  int64 createdAt = 20;
+  int64 updatedAt = 21;
+}
+
+message Profile {
+  string id = 1;
+  string displayName = 2;
+  string statusMessage = 3;
+  string iconPath = 4;
+
+  int64 createdAt = 20;
+  int64 updatedAt = 21;
+}
+
+
+// talk service
+enum MessageType {
+  TEXT = 0;
+
+  IMAGE = 1;
+  VIDEO = 2;
+  GIF = 3;
+
+  LOCATION = 4;
+  CONTACT = 5;
+}
+
+message Message {
+  string id = 1;
+  string from = 2; // message sender
+  string to = 3; // message receiver
+  MessageType contentType = 4;
+  string metadata = 5; // json
+  string text = 6;
+
+  int64 createdAt = 20;
+  int64 updatedAt = 21;
+}
+
+
+// operation service
+enum OpType {
+  NOOP = 0;
+}
+
+message Operation {
+  int64 id = 1;
+  OpType type = 2;
+  string source = 3;
+  repeated string dest = 4;
+}
