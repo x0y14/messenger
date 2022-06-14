@@ -1,5 +1,6 @@
 use tonic::{transport::Server, Request, Response, Status};
 
+
 use talk_service::{
     talk_service_server::{TalkService, TalkServiceServer},
     SendMessageRequest, SendMessageReply,
@@ -8,8 +9,8 @@ use talk_service::{
 
 use types::{
     PingRequest, PingReply,
-    OpType, Operation,
-    MessageType, Message,
+    // OpType, Operation,
+    // MessageType, Message,
 };
 
 
@@ -34,15 +35,15 @@ impl TalkService for TalkServiceProvider {
     }
 
     async fn send_message(&self, request: Request<SendMessageRequest>) -> Result<Response<SendMessageReply>, Status> {
-        let reply = talk_service::SendMessageReply{
+        let reply = talk_service::SendMessageReply {
             revision: 0,
-            message: request.into_inner().message
+            message: request.into_inner().message,
         };
         Ok(Response::new(reply))
     }
 
     async fn send_read_receipt(&self, _: Request<SendReadReceiptRequest>) -> Result<Response<SendReadReceiptReply>, Status> {
-        let reply = talk_service::SendReadReceiptReply{
+        let reply = talk_service::SendReadReceiptReply {
             revision: 0,
         };
         Ok(Response::new(reply))
