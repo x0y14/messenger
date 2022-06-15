@@ -2,6 +2,10 @@ use warp::Filter;
 
 #[tokio::main]
 async fn main() {
+    let addr = 3030;
+
+    println!("id-gen listening on: {}", addr);
+
     let root = warp::path::end().map(|| "id-gen");
     let ping = warp::path("ping").map(|| "ping");
 
@@ -12,6 +16,6 @@ async fn main() {
         .or(ping)
         .or(revision)
         .or(id))
-        .run(([127, 0, 0, 1], 3030))
+        .run(([0, 0, 0, 0], addr))
         .await;
 }
