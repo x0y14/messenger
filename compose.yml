@@ -1,0 +1,6 @@
+services:
+  idgen:
+    image: idgen
+    build: ./idgen
+    ports:
+      - "3030:3030"
