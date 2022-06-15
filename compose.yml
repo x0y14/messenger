@@ -1,6 +1,25 @@
 services:
   idgen:
-    image: idgen
-    build: ./idgen
+    image: messenger-idgen
+    build:
+      context: .
+      dockerfile: ./idgen/Dockerfile
+    container_name: msg-idgen-dev
+#    ports:
+#      - "3030:3030"
+    networks:
+      - internal
+
+  talk:
+    image: messenger-talk
+    build:
+      context: .
+      dockerfile: ./grpc/talk/Dockerfile
+    container_name: msg-talk-dev
     ports:
-      - "3030:3030"
+      - "50050:50050"
+    networks:
+      - internal
+
+networks:
+  internal: {}

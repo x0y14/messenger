@@ -1,5 +1,7 @@
-use tonic::{transport::Server, Request, Response, Status};
+extern crate core;
 
+use tonic::{transport::Server, Request, Response, Status};
+use talk::{pick_new_id, pick_new_revision};
 
 use talk_service::{
     talk_service_server::{TalkService, TalkServiceServer},
@@ -10,7 +12,7 @@ use talk_service::{
 use types::{
     PingRequest, PingReply,
     // OpType, Operation,
-    // MessageType, Message,
+    MessageType, Message,
 };
 
 
@@ -35,16 +37,48 @@ impl TalkService for TalkServiceProvider {
     }
 
     async fn send_message(&self, request: Request<SendMessageRequest>) -> Result<Response<SendMessageReply>, Status> {
+        let rev = match pick_new_revision().await {
+            Ok(_rev) => {_rev}
+            Err(err) => {
+                return Err(Status::unknown(err.to_string()))
+            }
+        };
+
+        let msg_id = match pick_new_id().await {
+            Ok(_msg_id) => {_msg_id}
+            Err(err) => {
+                return Err(Status::unknown(err.to_string()))
+            }
+        };
+
+        let msg = Message{
+            id: msg_id,
+            content_type: MessageType::Text as i32,
+            from: "from".to_string(),
+            to: "to".to_string(),
+            metadata: "{}".to_string(),
+            text: "placeholder".to_string(),
+            created_at: 0,
+            updated_at: 0,
+        };
+
         let reply = talk_service::SendMessageReply {
-            revision: 0,
-            message: request.into_inner().message,
+            revision: rev,
+            message: Some(msg),
         };
         Ok(Response::new(reply))
     }
 
     async fn send_read_receipt(&self, _: Request<SendReadReceiptRequest>) -> Result<Response<SendReadReceiptReply>, Status> {
+        let rev1 = match pick_new_revision().await {
+            Ok(_rev) => {_rev}
+            Err(err) => {
+                return Err(Status::unknown(err.to_string()))
+            }
+        };
+
         let reply = talk_service::SendReadReceiptReply {
-            revision: 0,
+            revision: rev1,
         };
         Ok(Response::new(reply))
     }
@@ -52,7 +86,7 @@ impl TalkService for TalkServiceProvider {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let addr = "[::1]:50051".parse().unwrap();
+    let addr = "0.0.0.0:50050".parse().unwrap();
     let provider = TalkServiceProvider::default();
 
     println!("TalkServiceServer listening on {}", addr);
