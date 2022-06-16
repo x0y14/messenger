@@ -1,25 +1,37 @@
 services:
-  idgen:
-    image: messenger-idgen
+#  idgen:
+#    image: messenger-idgen
+#    build:
+#      context: .
+#      dockerfile: ./idgen/Dockerfile
+#    container_name: msg-idgen-dev
+#    networks:
+#      - internal
+
+  blob-storage:
+    image: messenger-blob-storage
     build:
       context: .
-      dockerfile: ./idgen/Dockerfile
-    container_name: msg-idgen-dev
-#    ports:
-#      - "3030:3030"
+      dockerfile: ./blob/Dockerfile
+    container_name: msg-blob-dev
+    volumes:
+      - ./blob/storage:/usr/local/app/storage
+    ports:
+      - "4040:4040"
     networks:
       - internal
 
-  talk:
-    image: messenger-talk
-    build:
-      context: .
-      dockerfile: ./grpc/talk/Dockerfile
-    container_name: msg-talk-dev
-    ports:
-      - "50050:50050"
-    networks:
-      - internal
+#  talk:
+#    image: messenger-talk
+#    build:
+#      context: .
+#      dockerfile: ./grpc/talk/Dockerfile
+#    container_name: msg-talk-dev
+#    ports:
+#      - "50050:50050"
+#    networks:
+#      - internal
+
 
 networks:
   internal: {}
