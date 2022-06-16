@@ -1,4 +1,24 @@
 services:
+  pulsar:
+    image: apachepulsar/pulsar:2.9.1
+    container_name: msg-pulsar-dev
+    ports:
+      - "6650:6650"
+      - "8080:8080"
+    command: bin/pulsar standalone
+    volumes:
+      - type: volume
+        source: pulsardata
+        target: "/pulsar/data"
+      - type: volume
+        source: pulsarconf
+        target: "/pulsar/conf"
+
+#  $ docker run -it -p 6650:6650  -p 8080:8080
+#  --mount source=pulsardata,target=/pulsar/data
+#  --mount source=pulsarconf,target=/pulsar/conf
+# apachepulsar/pulsar:2.9.1 bin/pulsar standalone
+
 #  idgen:
 #    image: messenger-idgen
 #    build:
@@ -8,18 +28,18 @@ services:
 #    networks:
 #      - internal
 
-  blob-storage:
-    image: messenger-blob-storage
-    build:
-      context: .
-      dockerfile: ./blob/Dockerfile
-    container_name: msg-blob-dev
-    volumes:
-      - ./blob/storage:/usr/local/app/storage
-    ports:
-      - "4040:4040"
-    networks:
-      - internal
+#  blob-storage:
+#    image: messenger-blob-storage
+#    build:
+#      context: .
+#      dockerfile: ./blob/Dockerfile
+#    container_name: msg-blob-dev
+#    volumes:
+#      - ./blob/storage:/usr/local/app/storage
+#    ports:
+#      - "4040:4040"
+#    networks:
+#      - internal
 
 #  talk:
 #    image: messenger-talk
@@ -35,3 +55,7 @@ services:
 
 networks:
   internal: {}
+
+volumes:
+  pulsardata:
+  pulsarconf:
