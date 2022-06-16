@@ -14,18 +14,18 @@ message Account {
   string email = 2;
   string username = 3;
 
-  int64 createdAt = 20;
-  int64 updatedAt = 21;
+  string created_at = 20;
+  string updated_at = 21;
 }
 
 message Profile {
   string id = 1;
-  string displayName = 2;
-  string statusMessage = 3;
-  string iconPath = 4;
+  string display_name = 2;
+  string status_message = 3;
+  string icon_path = 4;
 
-  int64 createdAt = 20;
-  int64 updatedAt = 21;
+  string created_at = 20;
+  string updated_at = 21;
 }
 
 
@@ -45,12 +45,12 @@ message Message {
   string id = 1;
   string from = 2; // message sender
   string to = 3; // message receiver
-  MessageType contentType = 4;
+  MessageType content_type = 4;
   string metadata = 5; // json
   string text = 6;
 
-  int64 createdAt = 20;
-  int64 updatedAt = 21;
+  string created_at = 20;
+  string updated_at = 21;
 }
 
 
@@ -61,7 +61,7 @@ enum OpType {
 
 message Operation {
   int64 id = 1;
-  OpType opType = 2;
+  OpType op_type = 2;
   string source = 3;
   repeated string dest = 4;
 }

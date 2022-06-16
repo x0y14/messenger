@@ -16,7 +16,7 @@ message SendMessageReply  {
 // 既読送信
 // SendReadReceipt
 message SendReadReceiptRequest {
-  string messageId = 1;
+  string message_id = 1;
 }
 message SendReadReceiptReply {
   int64 revision = 1;

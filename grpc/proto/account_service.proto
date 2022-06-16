@@ -35,13 +35,13 @@ message UpdateProfileReply  {
 message GetFriendsRequest {}
 message GetFriendsReply  {
   int64 revision = 1;
-  repeated string userIds = 2;
+  repeated string user_ids = 2;
 }
 
 // 友達追加
 // AddFriend
 message AddFriendRequest {
-  string userId = 1;
+  string user_id = 1;
 }
 message AddFriendReply  {
   int64 revision = 1;
