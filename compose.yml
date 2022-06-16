@@ -1,4 +1,25 @@
 services:
+  db:
+    image: mysql:8.0-oracle
+    container_name: msg-db
+    environment:
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_DATABASE: "${MYSQL_DATABASE}"
+      MYSQL_USER: "${MYSQL_USER}"
+      MYSQL_PASSOWRD: "${MYSQL_PASSWORD}"
+    command: mysqld --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    ports:
+      - "3306:3306"
+    expose:
+      - "3306"
+    volumes:
+      - ./mysql/db/data:/var/lib/mysql
+      - ./mysql/db/conf.d:/etc/mysql/conf.d/user.cnf
+      - ./mysql/db/sql:/docker-entrypoint-initdb.d
+    networks:
+      - internal
+
+
   pulsar:
     image: apachepulsar/pulsar:2.9.1
     container_name: msg-pulsar-dev
