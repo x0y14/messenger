@@ -1,0 +1,31 @@
+syntax = "proto3";
+package talk_service;
+import "types.proto";
+
+
+// メッセージ送信
+// SendMessage
+message SendMessageRequest {
+  types.Message message = 1;
+}
+message SendMessageReply  {
+  int64 revision = 1;
+  types.Message message = 2;
+}
+
+// 既読送信
+// SendReadReceipt
+message SendReadReceiptRequest {
+  string message_id = 1;
+}
+message SendReadReceiptReply {
+  int64 revision = 1;
+}
+
+
+service TalkService {
+  rpc Ping(types.PingRequest) returns (types.PingReply) {};
+
+  rpc SendMessage(SendMessageRequest) returns (SendMessageReply) {};
+  rpc SendReadReceipt(SendReadReceiptRequest) returns (SendReadReceiptReply) {};
+}
