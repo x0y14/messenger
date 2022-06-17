@@ -1,0 +1,28 @@
+FROM rust:1.61 as builder
+RUN apt-get update && apt-get -y install cmake
+
+# 使い捨てクレートを作り、キャッシュさせる
+RUN USER=root cargo new --bin grpc
+WORKDIR /grpc
+RUN USER=root cargo new --bin talk
+RUN USER=root cargo new --bin op
+
+COPY ./grpc/talk/Cargo.toml ./talk/Cargo.toml
+COPY ./grpc/Cargo.toml ./Cargo.toml
+COPY ./grpc/Cargo.lock ./Cargo.lock
+
+RUN cargo build -p talk --release
+RUN rm talk/src/*.rs
+
+# build prepare
+COPY ./grpc/proto ./proto
+COPY ./grpc/talk/build.rs ./talk/build.rs
+COPY ./grpc/talk/src ./talk/src
+
+RUN rm ./target/release/deps/talk*
+RUN cargo build -p talk --release
+
+FROM rust:1.61-slim-buster
+COPY --from=builder /grpc/target/release/talk .
+
+CMD ["./talk"]
