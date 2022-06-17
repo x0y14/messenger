@@ -55,7 +55,7 @@ services:
     image: messenger-talk
     build:
       context: .
-      dockerfile: ./grpc/talk/Dockerfile
+      dockerfile: ./grpc/talk/Dockerfile-slim
     container_name: msg-talk-dev
     ports:
       - "50050:50050"
