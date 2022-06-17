@@ -21,6 +21,7 @@ pub mod types {
 use types::{
     PingRequest, PingReply,
     OpType, Operation,
+    Message, MessageType
 };
 
 // no Default?
@@ -44,13 +45,25 @@ impl OperationService for OperationServiceProvider {
         println!("fetch_ops");
         println!("\tconnected: {:?}", request.remote_addr());
 
+        let msg = Message{
+            id: "".to_string(),
+            content_type: MessageType::Text as i32,
+            from: "from".to_string(),
+            to: "to".to_string(),
+            metadata: "{}".to_string(),
+            text: "placeholder".to_string(),
+            created_at: "".to_string(),
+            updated_at: "".to_string(),
+        };
+
         let repeat = std::iter::repeat(FetchOpsReply {
             op: Some(Operation {
                 id: 0,
                 op_type: OpType::Noop as i32,
                 source: "".to_string(),
                 dest: vec!["".to_string()],
-            })
+            }),
+            message: Some(msg),
         });
         let mut stream = Box::pin(tokio_stream::iter(repeat).throttle(Duration::from_millis(200)));
 

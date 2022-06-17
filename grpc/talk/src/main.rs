@@ -58,8 +58,8 @@ impl TalkService for TalkServiceProvider {
             to: "to".to_string(),
             metadata: "{}".to_string(),
             text: "placeholder".to_string(),
-            created_at: 0,
-            updated_at: 0,
+            created_at: "".to_string(),
+            updated_at: "".to_string(),
         };
 
         let reply = talk_service::SendMessageReply {
