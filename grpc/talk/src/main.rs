@@ -89,7 +89,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let addr = "0.0.0.0:50050".parse().unwrap();
     let provider = TalkServiceProvider::default();
 
-    println!("TalkServiceServer listening on {}", addr);
+    println!("TalkServiceServer listening on {} !", addr);
 
     Server::builder()
         .add_service(TalkServiceServer::new(provider))
