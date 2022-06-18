@@ -12,9 +12,14 @@ static_resources:
         - filters:
             - name: envoy.filters.network.http_connection_manager
               typed_config:
-                "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+                "@type": type.googleapis.com/envoy.config.filter.network.http_connection_manager.v2.HttpConnectionManager
                 codec_type: auto
                 stat_prefix: ingress_http
+                access_log:
+                  - name: envoy.access_loggers.file
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.config.accesslog.v2.FileAccessLog
+                      path: "/dev/stdout"
                 route_config:
                   name: local_route
                   virtual_hosts:
@@ -24,9 +29,7 @@ static_resources:
                         - match: { prefix: "/" }
                           route:
                             cluster: greeter_service
-                            timeout: 0s
-                            max_stream_duration:
-                              grpc_timeout_header_max: 0s
+                            max_grpc_timeout: 0s
                       cors:
                         allow_origin_string_match:
                           - prefix: "*"
@@ -36,21 +39,18 @@ static_resources:
                         expose_headers: custom-header-1,grpc-status,grpc-message
                 http_filters:
                   - name: envoy.filters.http.grpc_web
-                    typed_config:
-                      "@type": type.googleapis.com/envoy.extensions.filters.http.grpc_web.v3.GrpcWeb
                   - name: envoy.filters.http.cors
-                    typed_config:
-                      "@type": type.googleapis.com/envoy.extensions.filters.http.cors.v3.Cors
                   - name: envoy.filters.http.router
-                    typed_config:
-                      "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
   clusters:
     - name: greeter_service
       connect_timeout: 0.25s
       type: logical_dns
       http2_protocol_options: {}
       lb_policy: round_robin
-      # win/mac hosts: Use address: host.docker.internal instead of address: localhost in the line below
+      dns_lookup_family: V4_ONLY
+      upstream_connection_options:
+        tcp_keepalive:
+          keepalive_time: 300
       load_assignment:
         cluster_name: cluster_0
         endpoints:
