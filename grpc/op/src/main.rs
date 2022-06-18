@@ -61,7 +61,7 @@ impl OperationService for OperationServiceProvider {
                 id: 0,
                 op_type: OpType::Noop as i32,
                 source: "".to_string(),
-                dest: vec!["".to_string()],
+                destination: vec!["".to_string()],
             }),
             message: Some(msg),
         });
