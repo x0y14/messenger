@@ -135,7 +135,7 @@ create table operations
             primary key,
     op_type    int           not null,
     source     varchar(20)   not null,
-    dest       varchar(20)[] not null,
+    destination       text[] not null,
     created_at TIMESTAMPTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

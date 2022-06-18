@@ -63,5 +63,5 @@ message Operation {
   int64 id = 1;
   OpType op_type = 2;
   string source = 3;
-  repeated string dest = 4;
+  repeated string destination = 4;
 }
