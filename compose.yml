@@ -1,4 +1,13 @@
 services:
+  envoy:
+    build:
+      context: ./proxy
+    container_name: envoy-grpc-proxy
+    ports:
+      - "9090:9090"
+    networks:
+      - internal
+
   db:
     image: postgres:14
     container_name: msg-db
@@ -33,6 +42,8 @@ services:
       context: .
       dockerfile: ./idgen/Dockerfile
     container_name: msg-idgen-dev
+    expose:
+      - "3030"
     networks:
       - internal
 
@@ -60,8 +71,21 @@ services:
     networks:
       - internal
 
+  op:
+    image: messenger-op
+    build:
+      context: .
+      dockerfile: ./grpc/op/Dockerfile
+    container_name: msg-op-dev
+    expose:
+      - "50051"
+    ports:
+      - "50051:50051"
+    networks:
+      - internal
+
 networks:
-  internal: {}
+  internal: { }
 
 volumes:
   pulsardata:

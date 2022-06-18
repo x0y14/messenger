@@ -94,7 +94,7 @@ impl OperationService for OperationServiceProvider {
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     let server = OperationServiceProvider{};
-    let addr = "[::1]:50051".to_socket_addrs().unwrap().next().unwrap();
+    let addr = "0.0.0.0:50051".parse().unwrap();
     println!("OperationService listening on {}", addr);
     Server::builder()
         .add_service(OperationServiceServer::new(server))
