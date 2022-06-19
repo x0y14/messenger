@@ -1,7 +1,7 @@
 extern crate core;
 
 use tonic::{transport::Server, Request, Response, Status};
-use talk::{pick_new_id, pick_new_revision};
+// use talk::{pick_new_id, pick_new_revision};
 
 use talk_service::{
     talk_service_server::{TalkService, TalkServiceServer},
@@ -37,14 +37,14 @@ impl TalkService for TalkServiceProvider {
     }
 
     async fn send_message(&self, request: Request<SendMessageRequest>) -> Result<Response<SendMessageReply>, Status> {
-        let rev = match pick_new_revision().await {
+        let rev = match talk::pick_new_revision().await {
             Ok(_rev) => {_rev}
             Err(err) => {
                 return Err(Status::unknown(err.to_string()))
             }
         };
 
-        let msg_id = match pick_new_id().await {
+        let msg_id = match talk::pick_new_id().await {
             Ok(_msg_id) => {_msg_id}
             Err(err) => {
                 return Err(Status::unknown(err.to_string()))
@@ -70,7 +70,7 @@ impl TalkService for TalkServiceProvider {
     }
 
     async fn send_read_receipt(&self, _: Request<SendReadReceiptRequest>) -> Result<Response<SendReadReceiptReply>, Status> {
-        let rev1 = match pick_new_revision().await {
+        let rev1 = match talk::pick_new_revision().await {
             Ok(_rev) => {_rev}
             Err(err) => {
                 return Err(Status::unknown(err.to_string()))
