@@ -35,8 +35,8 @@ use supervisor::{pick_new_id, pick_new_revision};
 use supervisor::supervisor_service::{};
 use supervisor::types::{};
 use crate::mq::Notice;
-use crate::operations::{establish_connection, insert_op, NewOperation};
-use crate::profiles::{connect, get_profile, insert_profile, NewProfile};
+use crate::operations::{insert_op, NewOperation};
+use crate::profiles::{get_profile, insert_profile, NewProfile};
 
 
 #[derive(Default)]
