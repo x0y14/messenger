@@ -1,3 +1,6 @@
+mod models;
+mod schema;
+
 extern crate core;
 
 use tonic::{transport::Server, Request, Response, Status};
@@ -25,7 +28,9 @@ pub mod types {
 }
 
 #[derive(Default)]
-pub struct TalkServiceProvider {}
+pub struct TalkServiceProvider {
+
+}
 
 #[tonic::async_trait]
 impl TalkService for TalkServiceProvider {
@@ -37,10 +42,11 @@ impl TalkService for TalkServiceProvider {
     }
 
     async fn send_message(&self, request: Request<SendMessageRequest>) -> Result<Response<SendMessageReply>, Status> {
+        // idgenからrevisionを取得
         let rev = match talk::pick_new_revision().await {
-            Ok(_rev) => {_rev}
-            Err(err) => {
-                return Err(Status::unknown(err.to_string()))
+            Ok(r) =>  {r}
+            Err(_) => {
+                return Err(Status::internal("Failed to get revision from id-gen-server."))
             }
         };
 
