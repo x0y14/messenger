@@ -46,6 +46,8 @@ services:
       - "3030"
     networks:
       - internal
+    ports:
+      - "3030:3030"
 
   blob-storage:
     image: messenger-blob-storage
@@ -83,6 +85,17 @@ services:
       - "50051:50051"
     networks:
       - internal
+
+  supervisor:
+    image: messenger-supervisor
+    build:
+      context: .
+      dockerfile: ./grpc/supervisor/Dockerfile
+    container_name: msg-supervisor-dev
+    expose:
+      - "50060"
+    ports:
+      - "50060:50060"
 
 networks:
   internal: { }

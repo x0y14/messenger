@@ -4,15 +4,11 @@
 #![allow(clippy::all)]
 
 
+use crate::schema::*;
+
 use chrono::DateTime;
 use chrono::offset::Utc;
 use diesel::sql_types::Json;
-
-use schema::profiles;
-use schema::operations;
-use schema::accounts;
-use schema::messages;
-use crate::schema;
 
 #[derive(Queryable, Debug, Identifiable)]
 pub struct Account {
@@ -38,7 +34,7 @@ pub struct Message {
 #[derive(Queryable, Debug, Identifiable)]
 #[primary_key(revision)]
 pub struct Operation {
-    pub revision: i32,
+    pub revision: i64,
     pub op_type: i32,
     pub source: String,
     pub destination: Vec<String>,

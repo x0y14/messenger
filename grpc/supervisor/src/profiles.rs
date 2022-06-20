@@ -7,6 +7,7 @@ use serde_derive::Deserialize;
 use crate::schema::profiles as profiles_schema;
 
 pub type PgPool = Pool<ConnectionManager<PgConnection>>;
+
 static DB_URL: &str = "postgres://docker:password@0.0.0.0:5432/messenger_db";
 
 pub fn connect() -> PgPool {
@@ -20,27 +21,21 @@ pub fn get_profile(pool: Pool<ConnectionManager<PgConnection>>, user_id: String)
     let profs = profiles.load::<Profile>(&cl).expect("failed to load profiles");
     println!("<profile");
     for p in profs {
-        println!("profile: {}",p.display_name);
+        println!("profile: {}", p.display_name);
     }
     println!("profile>");
-    return "".to_string()
+    return "".to_string();
 }
 
 
 #[derive(Debug, Insertable, Deserialize)]
-#[table_name="profiles_schema"]
+#[table_name = "profiles_schema"]
 pub struct NewProfile {
     pub id: String,
     pub display_name: String,
     pub status_message: String,
-    pub icon_path: String
+    pub icon_path: String,
 }
-// id -> Varchar,
-// display_name -> Varchar,
-// status_message -> Nullable<Varchar>,
-// icon_path -> Nullable<Varchar>,
-// created_at -> Timestamptz,
-// updated_at -> Timestamptz,
 
 
 pub fn insert_profile(pool: Pool<ConnectionManager<PgConnection>>, prof: NewProfile) {

@@ -23,7 +23,7 @@ table! {
 
 table! {
     operations (revision) {
-        revision -> Int4,
+        revision -> Int8,
         op_type -> Int4,
         source -> Varchar,
         destination -> Array<Text>,

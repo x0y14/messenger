@@ -130,14 +130,14 @@ EXECUTE PROCEDURE refresh_updated_at_step3();
 -- operation
 create table operations
 (
-    revision   int           not null
+    revision    BIGINT      not null
         constraint operations_pk
             primary key,
-    op_type    int           not null,
-    source     varchar(20)   not null,
-    destination       text[] not null,
-    created_at TIMESTAMPTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMPTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP
+    op_type     int         not null,
+    source      varchar(20) not null,
+    destination text[]      not null,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TRIGGER refresh_operations_updated_at_step1
