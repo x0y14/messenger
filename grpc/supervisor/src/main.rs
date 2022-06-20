@@ -28,6 +28,7 @@ mod schema;
 mod mq;
 mod operations;
 mod accounts;
+mod db;
 
 use tonic::{transport::Server, Request, Response, Status};
 use supervisor::{pick_new_id, pick_new_revision};

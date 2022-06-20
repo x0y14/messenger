@@ -1,34 +1,19 @@
-use std::env;
-use std::fmt::format;
-// extern crate dotenv;
-use diesel::{r2d2::{Pool, ConnectionManager, PooledConnection}, pg::PgConnection, Connection, RunQueryDsl};
-use dotenv::dotenv;
-use crate::operations;
-use crate::schema::operations as operations_schema;
-
-
-pub fn establish_connection() -> PgConnection {
-    dotenv().ok();
-
-    let db_url = env::var("DATABASE_URL")
-        .expect("not found: DATABASE_URL");
-    PgConnection::establish(&db_url)
-        .expect(&format!("failed to connect: {}", db_url))
-}
+use diesel::{pg::PgConnection, RunQueryDsl};
+use crate::accounts;
+use crate::schema::accounts as accounts_schema;
 
 
 #[derive(Insertable, Debug)]
-#[table_name="operations_schema"]
-pub struct NewOperation {
-    pub revision: i64,
-    pub op_type: i32,
-    pub source: String,
-    pub destination: Vec<String>,
+#[table_name = "accounts_schema"]
+pub struct NewAccount {
+    pub id: String,
+    pub email: String,
+    pub username: Option<String>,
 }
 
 
-pub fn insert_op(conn: &PgConnection, op: NewOperation) {
+pub fn insert_account(conn: &PgConnection, account: NewAccount) {
     let cl = conn.clone();
-    diesel::insert_into(operations)
-        .values(&op).execute(cl).expect("failed to insert op");
+    diesel::insert_into(accounts)
+        .values(&account).execute(cl).expect("failed to insert account");
 }

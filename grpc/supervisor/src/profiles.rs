@@ -1,24 +1,14 @@
-use diesel::{r2d2::{Pool, ConnectionManager, PooledConnection}, pg::PgConnection, Connection, RunQueryDsl};
+use diesel::{pg::PgConnection, RunQueryDsl};
 use crate::models::Profile;
 use crate::profiles;
 use diesel;
-use diesel::prelude::*;
 use serde_derive::Deserialize;
 use crate::schema::profiles as profiles_schema;
 
-pub type PgPool = Pool<ConnectionManager<PgConnection>>;
 
-static DB_URL: &str = "postgres://docker:password@0.0.0.0:5432/messenger_db";
-
-pub fn connect() -> PgPool {
-    let manager = ConnectionManager::<PgConnection>::new(DB_URL);
-    Pool::new(manager).expect("failed to create pool")
-}
-
-pub fn get_profile(pool: Pool<ConnectionManager<PgConnection>>, user_id: String) -> String {
-    // let pool_clone = pool.clone();
-    let cl = pool.get().unwrap();
-    let profs = profiles.load::<Profile>(&cl).expect("failed to load profiles");
+pub fn get_profile(conn: &PgConnection, user_id: String) -> String {
+    let cl = conn.clone();
+    let profs = profiles.load::<Profile>(cl).expect("failed to load profiles");
     println!("<profile");
     for p in profs {
         println!("profile: {}", p.display_name);
@@ -38,10 +28,9 @@ pub struct NewProfile {
 }
 
 
-pub fn insert_profile(pool: Pool<ConnectionManager<PgConnection>>, prof: NewProfile) {
-    // let pool_clone = pool.clone();
-    let cl = pool.get().unwrap();
+pub fn insert_profile(conn: &PgConnection, prof: NewProfile) {
+    let cl = conn.clone();
 
     diesel::insert_into(profiles)
-        .values(&prof).execute(&cl).expect("Failed to insert profile");
+        .values(&prof).execute(cl).expect("Failed to insert profile");
 }
