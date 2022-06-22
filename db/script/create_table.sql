@@ -1,36 +1,3 @@
--- updated_atのトリガー郡
--- https://zenn.dev/mpyw/articles/rdb-ids-and-timestamps-best-practices#updated_at-（update-時のデフォルト埋め）
-CREATE FUNCTION refresh_updated_at_step1() RETURNS trigger AS
-$$
-BEGIN
-    IF NEW.updated_at = OLD.updated_at THEN
-        NEW.updated_at := NULL;
-    END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE FUNCTION refresh_updated_at_step2() RETURNS trigger AS
-$$
-BEGIN
-    IF NEW.updated_at IS NULL THEN
-        NEW.updated_at := OLD.updated_at;
-    END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE FUNCTION refresh_updated_at_step3() RETURNS trigger AS
-$$
-BEGIN
-    IF NEW.updated_at IS NULL THEN
-        NEW.updated_at := CURRENT_TIMESTAMP;
-    END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-
 -- account
 create table accounts
 (
@@ -49,22 +16,6 @@ create unique index accounts_email_uindex
 create unique index accounts_username_uindex
     on accounts (username);
 
-CREATE TRIGGER refresh_accounts_updated_at_step1
-    BEFORE UPDATE
-    ON accounts
-    FOR EACH ROW
-EXECUTE PROCEDURE refresh_updated_at_step1();
-CREATE TRIGGER refresh_accounts_updated_at_step2
-    BEFORE UPDATE OF updated_at
-    ON accounts
-    FOR EACH ROW
-EXECUTE PROCEDURE refresh_updated_at_step2();
-CREATE TRIGGER refresh_accounts_updated_at_step3
-    BEFORE UPDATE
-    ON accounts
-    FOR EACH ROW
-EXECUTE PROCEDURE refresh_updated_at_step3();
-
 
 -- profile
 create table profiles
@@ -78,22 +29,6 @@ create table profiles
     created_at     TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at     TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-
-CREATE TRIGGER refresh_profiles_updated_at_step1
-    BEFORE UPDATE
-    ON profiles
-    FOR EACH ROW
-EXECUTE PROCEDURE refresh_updated_at_step1();
-CREATE TRIGGER refresh_profiles_updated_at_step2
-    BEFORE UPDATE OF updated_at
-    ON profiles
-    FOR EACH ROW
-EXECUTE PROCEDURE refresh_updated_at_step2();
-CREATE TRIGGER refresh_profiles_updated_at_step3
-    BEFORE UPDATE
-    ON profiles
-    FOR EACH ROW
-EXECUTE PROCEDURE refresh_updated_at_step3();
 
 
 -- message
@@ -111,21 +46,6 @@ create table messages
     updated_at   TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TRIGGER refresh_messages_updated_at_step1
-    BEFORE UPDATE
-    ON messages
-    FOR EACH ROW
-EXECUTE PROCEDURE refresh_updated_at_step1();
-CREATE TRIGGER refresh_messages_updated_at_step2
-    BEFORE UPDATE OF updated_at
-    ON messages
-    FOR EACH ROW
-EXECUTE PROCEDURE refresh_updated_at_step2();
-CREATE TRIGGER refresh_messages_updated_at_step3
-    BEFORE UPDATE
-    ON messages
-    FOR EACH ROW
-EXECUTE PROCEDURE refresh_updated_at_step3();
 
 -- operation
 create table operations
@@ -140,20 +60,3 @@ create table operations
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TRIGGER refresh_operations_updated_at_step1
-    BEFORE UPDATE
-    ON operations
-    FOR EACH ROW
-EXECUTE PROCEDURE refresh_updated_at_step1();
-
-CREATE TRIGGER refresh_operations_updated_at_step2
-    BEFORE UPDATE OF updated_at
-    ON operations
-    FOR EACH ROW
-EXECUTE PROCEDURE refresh_updated_at_step2();
-
-CREATE TRIGGER refresh_operations_updated_at_step3
-    BEFORE UPDATE
-    ON operations
-    FOR EACH ROW
-EXECUTE PROCEDURE refresh_updated_at_step3();
