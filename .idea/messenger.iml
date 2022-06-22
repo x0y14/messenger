@@ -13,6 +13,7 @@
       <sourceFolder url="file://$MODULE_DIR$/grpc/talk/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/grpc/account/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/grpc/supervisor/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/grpc/connector/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
       <excludeFolder url="file://$MODULE_DIR$/grpc/target" />
       <excludeFolder url="file://$MODULE_DIR$/idgen/target" />
@@ -23,9 +24,9 @@
       <excludeFolder url="file://$MODULE_DIR$/grpc/supervisor/target" />
       <excludeFolder url="file://$MODULE_DIR$/grpc/account/target" />
       <excludeFolder url="file://$MODULE_DIR$/.idea/dataSources" />
+      <excludeFolder url="file://$MODULE_DIR$/grpc/connector/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Python 3.9 (messenger) interpreter library" level="application" />
   </component>
 </module>
