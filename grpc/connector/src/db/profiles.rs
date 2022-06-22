@@ -11,14 +11,14 @@ pub fn get_single_profile(pool_clone: Pool, user_id: String) -> Result<Profile, 
     profiles.find(user_id).get_result::<Profile>(&conn)
 }
 
-pub fn insert_single_profile(pool_clone: Pool, profile: InputInsertProfile) -> Result<Profile, diesel::result::Error> {
+pub fn insert_single_profile(pool_clone: Pool, input_profile: InputInsertProfile) -> Result<Profile, diesel::result::Error> {
     let conn = pool_clone.get().unwrap();
 
     let new_profile = NewProfile {
-        id: profile.id,
-        display_name: profile.display_name,
-        status_message: profile.status_message,
-        icon_path: profile.icon_path,
+        id: input_profile.id,
+        display_name: input_profile.display_name,
+        status_message: input_profile.status_message,
+        icon_path: input_profile.icon_path,
         created_at: &datetime::now(),
         updated_at: &datetime::now()
     };
@@ -27,14 +27,14 @@ pub fn insert_single_profile(pool_clone: Pool, profile: InputInsertProfile) -> R
     Ok(res)
 }
 
-pub fn update_single_profile(pool_clone: Pool, user_id: String, profile: InputUpdateProfile) -> QueryResult<Result<Profile, diesel::result::Error>> {
+pub fn update_single_profile(pool_clone: Pool, user_id: String, input_profile: InputUpdateProfile) -> QueryResult<Result<Profile, diesel::result::Error>> {
     let conn = pool_clone.get().unwrap();
 
     let res = update(profiles.find(user_id))
         .set(&UpdateProfile{
-            display_name: profile.display_name,
-            status_message: profile.status_message,
-            icon_path: profile.icon_path,
+            display_name: input_profile.display_name,
+            status_message: input_profile.status_message,
+            icon_path: input_profile.icon_path,
             updated_at: &datetime::now()
         })
         .get_result(&conn);
