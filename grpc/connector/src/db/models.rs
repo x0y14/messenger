@@ -3,9 +3,10 @@
 #![allow(unused)]
 #![allow(clippy::all)]
 
-use diesel::sql_types::Json;
-use diesel::sql_types::Timestamptz;
+
+use diesel::sql_types::{Timestamptz};
 use serde::{Deserialize, Serialize};
+use serde_json;
 use crate::db::schema::*;
 
 
@@ -20,17 +21,43 @@ pub struct Account {
     pub updated_at: DateTime<Utc>,
 }
 
+// 取得用
 #[derive(Queryable, Debug, Identifiable)]
 pub struct Message {
     pub id: String,
     pub from: String,
     pub to: String,
     pub content_type: i32,
-    pub metadata: Json,
+    pub metadata: serde_json::Value,
     pub text: String,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
+
+// 入力用
+pub struct InputInsertMessage<'a> {
+    pub id: &'a String,
+    pub from: &'a String,
+    pub to: &'a String,
+    pub content_type: &'a i32,
+    pub metadata: &'a serde_json::Value,
+    pub text: &'a String
+}
+
+// 挿入用
+#[derive(Insertable, Debug)]
+#[table_name = "messages"]
+pub struct NewMessage<'a> {
+    pub id: &'a String,
+    pub from: &'a String,
+    pub to: &'a String,
+    pub content_type: &'a i32,
+    pub metadata: &'a serde_json::Value,
+    pub text: &'a String,
+    pub created_at: &'a DateTime<Utc>,
+    pub updated_at: &'a DateTime<Utc>,
+}
+
 
 #[derive(Queryable, Debug, Identifiable)]
 #[primary_key(revision)]
@@ -43,6 +70,7 @@ pub struct Operation {
     pub updated_at: DateTime<Utc>,
 }
 
+// 取得用
 #[derive(Queryable, Debug)]
 pub struct Profile {
     pub id: String,
@@ -53,6 +81,7 @@ pub struct Profile {
     pub updated_at: DateTime<Utc>,
 }
 
+// 挿入用
 #[derive(Insertable, Debug)]
 #[table_name = "profiles"]
 pub struct NewProfile<'a> {
@@ -64,6 +93,7 @@ pub struct NewProfile<'a> {
     pub updated_at: &'a DateTime<Utc>,
 }
 
+// 入力用
 pub struct InputInsertProfile<'a> {
     pub id: &'a String,
     pub display_name: &'a String,
@@ -71,13 +101,14 @@ pub struct InputInsertProfile<'a> {
     pub icon_path: Option<&'a String>
 }
 
-
+// 入力用
 pub struct InputUpdateProfile<'a> {
     pub display_name: Option<&'a String>,
     pub status_message: Option<&'a String>,
     pub icon_path: Option<&'a String>
 }
 
+// 更新用
 #[derive(AsChangeset)]
 #[table_name="profiles"]
 pub struct UpdateProfile<'a> {

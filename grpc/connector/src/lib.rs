@@ -167,3 +167,91 @@ mod profiles_tests {
         assert_eq!(count, 1);
     }
 }
+
+#[cfg(test)]
+mod messages_test {
+    use chrono::{DateTime, Utc};
+    use diesel::{PgConnection, r2d2};
+    use diesel::r2d2::{ConnectionManager};
+    use dotenv::{dotenv, var};
+    use reqwest::header::TE;
+    use crate::db;
+    use crate::db::models::InputInsertMessage;
+    use crate::db::messages::{get_single_message, insert_single_message};
+    use crate::util::datetime::mock_time::set_mock_time;
+
+    static TEST_MSG_ID: &str = "test_msg_id";
+    static TEST_MSG_FROM: &str = "from";
+    static TEST_MSG_TO: &str = "to";
+    static TEST_MSG_CONTENT_TYPE: i32 = 0;
+    static TEST_MSG_TEXT: &str = "hello,world";
+    static TEST_MSG_CREATED_UPDATED_AT: &str = "2020-03-02T00:00:00+00:00";
+
+
+    #[test]
+    fn insert_one() {
+        // 接続
+        dotenv().ok();
+        let db_url = var("DATABASE_URL").expect("failed to load DATABASE_URL");
+
+        let manager = ConnectionManager::<PgConnection>::new(db_url);
+        let pool: db::Pool = r2d2::Pool::builder()
+            .build(manager)
+            .expect("failed to create pool");
+
+        // データ作成
+        let test_msg_metadata: serde_json::Value = serde_json::from_str("{\"kind\": 1}").unwrap();
+        let msg = InputInsertMessage {
+            id: &TEST_MSG_ID.to_string(),
+            from: &TEST_MSG_FROM.to_string(),
+            to: &TEST_MSG_TO.to_string(),
+            content_type: &TEST_MSG_CONTENT_TYPE,
+            metadata: &test_msg_metadata,
+            text: &TEST_MSG_TEXT.to_string(),
+        };
+
+        // 時間設定
+        let now_ = DateTime::parse_from_rfc3339(&TEST_MSG_CREATED_UPDATED_AT).unwrap().with_timezone(&Utc);
+        set_mock_time(now_);
+
+        // 挿入
+        let res = insert_single_message(pool.clone(), msg).expect("failed to insert message");
+
+        // 検証
+        assert_eq!(TEST_MSG_ID.to_string(), res.id);
+        assert_eq!(TEST_MSG_FROM.to_string(), res.from);
+        assert_eq!(TEST_MSG_TO.to_string(), res.to);
+        assert_eq!(TEST_MSG_CONTENT_TYPE, res.content_type);
+        assert_eq!(test_msg_metadata, res.metadata);
+        assert_eq!(TEST_MSG_TEXT.to_string(), res.text);
+        assert_eq!(now_, res.created_at);
+        assert_eq!(now_, res.updated_at);
+    }
+
+    #[test]
+    fn get_one() {
+        // 接続
+        dotenv().ok();
+        let db_url = var("DATABASE_URL").expect("failed to load DATABASE_URL");
+
+        let manager = ConnectionManager::<PgConnection>::new(db_url);
+        let pool: db::Pool = r2d2::Pool::builder()
+            .build(manager)
+            .expect("failed to create pool");
+
+        let test_msg_metadata: serde_json::Value = serde_json::from_str("{\"kind\": 1}").unwrap();
+        let msg = get_single_message(pool.clone(), TEST_MSG_ID.to_string()).expect("failed to get message");
+
+        let now_ = DateTime::parse_from_rfc3339(&TEST_MSG_CREATED_UPDATED_AT).unwrap().with_timezone(&Utc);
+
+        // 検証
+        assert_eq!(TEST_MSG_ID.to_string(), msg.id);
+        assert_eq!(TEST_MSG_FROM.to_string(), msg.from);
+        assert_eq!(TEST_MSG_TO.to_string(), msg.to);
+        assert_eq!(TEST_MSG_CONTENT_TYPE, msg.content_type);
+        assert_eq!(test_msg_metadata, msg.metadata);
+        assert_eq!(TEST_MSG_TEXT.to_string(), msg.text);
+        assert_eq!(now_, msg.created_at);
+        assert_eq!(now_, msg.updated_at);
+    }
+}
