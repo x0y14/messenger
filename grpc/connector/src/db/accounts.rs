@@ -1,13 +1,27 @@
-use diesel::{delete, insert_into, QueryDsl, RunQueryDsl, update};
+use std::f32::consts::E;
+use diesel::{delete, insert_into, QueryDsl, RunQueryDsl, update, ExpressionMethods};
+use diesel::result::Error;
 
 use crate::db::models::{Account, InputInsertAccount, InputUpdateAccount, NewAccount, UpdateAccount};
 use crate::db::Pool;
 use crate::db::schema::accounts::dsl::accounts;
+use crate::db::schema::accounts::email;
 use crate::util::datetime;
 
 pub fn get_single_account(pool_clone: Pool, user_id: String) -> Result<Account, diesel::result::Error> {
     let conn = pool_clone.get().unwrap();
     accounts.find(user_id).get_result(&conn)
+}
+
+
+pub fn get_multiple_account_with_email(pool_clone: Pool, input_email: String) -> Result<Vec<Account>, diesel::result::Error> {
+    // todo : test
+    let conn = pool_clone.get().unwrap();
+    let accos = accounts.filter(email.eq(input_email))
+        .limit(1)
+        .load::<Account>(&conn)?;
+
+    Ok(accos)
 }
 
 

@@ -2,11 +2,11 @@ use diesel::prelude::*;
 use diesel::r2d2::{self, ConnectionManager};
 
 mod schema;
-pub(crate) mod models;
-pub(crate) mod profiles;
-pub(crate) mod messages;
-pub (crate) mod accounts;
-pub (crate) mod operations;
+pub mod models;
+pub mod profiles;
+pub mod messages;
+pub mod accounts;
+pub mod operations;
 
 
 pub type Pool = r2d2::Pool<ConnectionManager<PgConnection>>;

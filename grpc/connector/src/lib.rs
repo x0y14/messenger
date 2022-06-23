@@ -1,4 +1,4 @@
-mod idgen;
+pub mod idgen;
 pub mod db;
 mod util;
 
@@ -265,7 +265,7 @@ mod accounts_tests {
 
     use crate::db;
     use crate::db::models::{InputInsertAccount, InputUpdateAccount};
-    use crate::db::accounts::{delete_single_account, get_single_account, insert_single_account, update_single_account};
+    use crate::db::accounts::{delete_single_account, get_multiple_account_with_email, get_single_account, insert_single_account, update_single_account};
     use crate::util::datetime::mock_time::set_mock_time;
 
     static TEST_USER_ID: &str = "test_id";
@@ -319,6 +319,31 @@ mod accounts_tests {
 
         let now_ = DateTime::parse_from_rfc3339(&TEST_CREATED_AT).unwrap().with_timezone(&Utc);
         let acc = get_single_account(pool.clone(), TEST_USER_ID.to_string()).expect("failed to get account");
+
+        assert_eq!(TEST_USER_ID.to_string(), acc.id);
+        assert_eq!(TEST_EMAIL.to_string(), acc.email);
+        assert_eq!(None, acc.username);
+        assert_eq!(now_, acc.created_at);
+        assert_eq!(now_, acc.updated_at);
+    }
+
+    #[test]
+    fn get_some_with_email_before_update() {
+        // 接続
+        dotenv().ok();
+        let db_url = var("DATABASE_URL").expect("failed to load DATABASE_URL");
+
+        let manager = ConnectionManager::<PgConnection>::new(db_url);
+        let pool: db::Pool = r2d2::Pool::builder()
+            .build(manager)
+            .expect("failed to create pool");
+
+        let now_ = DateTime::parse_from_rfc3339(&TEST_CREATED_AT).unwrap().with_timezone(&Utc);
+        let accs = get_multiple_account_with_email(pool.clone(), TEST_EMAIL.to_string()).expect("failed to get account");
+
+        assert_eq!(accs.len(), 1);
+
+        let acc = accs.first().unwrap();
 
         assert_eq!(TEST_USER_ID.to_string(), acc.id);
         assert_eq!(TEST_EMAIL.to_string(), acc.email);
