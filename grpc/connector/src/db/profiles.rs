@@ -27,7 +27,7 @@ pub fn insert_single_profile(pool_clone: Pool, input_profile: InputInsertProfile
     Ok(res)
 }
 
-pub fn update_single_profile(pool_clone: Pool, user_id: String, input_profile: InputUpdateProfile) -> QueryResult<Result<Profile, diesel::result::Error>> {
+pub fn update_single_profile(pool_clone: Pool, user_id: String, input_profile: InputUpdateProfile) -> Result<Profile, diesel::result::Error> {
     let conn = pool_clone.get().unwrap();
 
     let res = update(profiles.find(user_id))
@@ -37,7 +37,7 @@ pub fn update_single_profile(pool_clone: Pool, user_id: String, input_profile: I
             icon_path: input_profile.icon_path,
             updated_at: &datetime::now()
         })
-        .get_result(&conn);
+        .get_result(&conn).unwrap();
 
     Ok(res)
 }
