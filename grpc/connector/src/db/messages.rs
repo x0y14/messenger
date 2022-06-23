@@ -1,4 +1,4 @@
-use diesel::{update, delete, insert_into, QueryDsl, RunQueryDsl, QueryResult};
+use diesel::{insert_into, QueryDsl, RunQueryDsl};
 
 use crate::db::models::{InputInsertMessage, Message, NewMessage};
 use crate::db::Pool;
