@@ -1,3 +1,4 @@
+use chrono::{DateTime, FixedOffset, Utc};
 use connector::db::{accounts};
 use connector::idgen::{get_new_id, get_new_revision};
 mod lib;
@@ -36,8 +37,9 @@ pub struct SupervisorServiceProvider {
 #[tonic::async_trait]
 impl SupervisorService for SupervisorServiceProvider {
     async fn ping(&self, _: Request<PingRequest>) -> Result<Response<PingReply>, Status> {
+        let now_jst: DateTime<FixedOffset> = Utc::now().with_timezone(&FixedOffset::east(9 *3600));
         let reply = types::PingReply {
-            message: "".to_string(),
+            message: now_jst.to_rfc3339(),
         };
         Ok(Response::new(reply))
     }
