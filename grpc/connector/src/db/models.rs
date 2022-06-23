@@ -12,14 +12,50 @@ use crate::db::schema::*;
 
 use chrono::DateTime;
 use chrono::offset::Utc;
+
+// 取得用
 #[derive(Queryable, Debug, Identifiable)]
 pub struct Account {
     pub id: String,
     pub email: String,
     pub username: Option<String>,
-    pub created_at: Timestamptz,
+    pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
+
+// 挿入用
+#[derive(Insertable, Debug)]
+#[table_name = "accounts"]
+pub struct NewAccount<'a> {
+    pub id: &'a String,
+    pub email: &'a String,
+    pub username: Option<&'a String>,
+    pub created_at: &'a DateTime<Utc>,
+    pub updated_at: &'a DateTime<Utc>,
+}
+
+// 入力用
+pub struct InputInsertAccount<'a> {
+    pub id: &'a String,
+    pub email: &'a String,
+    pub username: Option<&'a String>,
+}
+
+// 入力用
+pub struct InputUpdateAccount<'a> {
+    pub email: Option<&'a String>,
+    pub username: Option<&'a String>,
+}
+
+// 更新用
+#[derive(AsChangeset)]
+#[table_name="accounts"]
+pub struct UpdateAccount<'a> {
+    pub email: Option<&'a String>,
+    pub username: Option<&'a String>,
+    pub updated_at: &'a DateTime<Utc>,
+}
+
 
 // 取得用
 #[derive(Queryable, Debug, Identifiable)]

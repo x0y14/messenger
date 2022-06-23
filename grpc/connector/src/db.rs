@@ -5,6 +5,7 @@ mod schema;
 pub(crate) mod models;
 pub(crate) mod profiles;
 pub(crate) mod messages;
+pub (crate) mod accounts;
 
 
 pub type Pool = r2d2::Pool<ConnectionManager<PgConnection>>;

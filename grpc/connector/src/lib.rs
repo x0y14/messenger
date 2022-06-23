@@ -117,7 +117,7 @@ mod profiles_tests {
             display_name: None,
             status_message: None,
             icon_path: Some(&TEST_ICON_PATH.to_string())
-        }).expect("failed to update profile").unwrap();
+        }).expect("failed to update profile");
 
         // 比較
         assert_eq!(TEST_USER_ID.to_string(), prof.id);
@@ -174,7 +174,7 @@ mod messages_test {
     use diesel::{PgConnection, r2d2};
     use diesel::r2d2::{ConnectionManager};
     use dotenv::{dotenv, var};
-    use reqwest::header::TE;
+
     use crate::db;
     use crate::db::models::InputInsertMessage;
     use crate::db::messages::{get_single_message, insert_single_message};
@@ -253,5 +253,137 @@ mod messages_test {
         assert_eq!(TEST_MSG_TEXT.to_string(), msg.text);
         assert_eq!(now_, msg.created_at);
         assert_eq!(now_, msg.updated_at);
+    }
+}
+
+#[cfg(test)]
+mod accounts_tests {
+    use chrono::{DateTime, Utc};
+    use diesel::{PgConnection, r2d2};
+    use diesel::r2d2::{ConnectionManager};
+    use dotenv::{dotenv, var};
+
+    use crate::db;
+    use crate::db::models::{InputInsertAccount, InputUpdateAccount};
+    use crate::db::accounts::{delete_single_account, get_single_account, insert_single_account, update_single_account};
+    use crate::util::datetime::mock_time::set_mock_time;
+
+    static TEST_USER_ID: &str = "test_id";
+    static TEST_EMAIL: &str = "example@example.example";
+    static TEST_CREATED_AT: &str = "2020-02-01T00:00:00+00:00";
+
+    static TEST_USER_NAME: &str = "test_handle_name";
+    static TEST_UPDATED_AT: &str = "2020-04-02T00:00:00+00:00";
+
+    #[test]
+    fn insert_one() {
+        // 接続
+        dotenv().ok();
+        let db_url = var("DATABASE_URL").expect("failed to load DATABASE_URL");
+
+        let manager = ConnectionManager::<PgConnection>::new(db_url);
+        let pool: db::Pool = r2d2::Pool::builder()
+            .build(manager)
+            .expect("failed to create pool");
+
+        // データ生成
+        let new_account = InputInsertAccount{
+            id: &TEST_USER_ID.to_string(),
+            email: &TEST_EMAIL.to_string(),
+            username: None
+        };
+
+        // 時間設定
+        let now_ = DateTime::parse_from_rfc3339(&TEST_CREATED_AT).unwrap().with_timezone(&Utc);
+        set_mock_time(now_);
+
+        let res = insert_single_account(pool.clone(), new_account).expect("failed to insert account");
+
+        assert_eq!(TEST_USER_ID.to_string(), res.id);
+        assert_eq!(TEST_EMAIL.to_string(), res.email);
+        assert_eq!(None, res.username);
+        assert_eq!(now_, res.created_at);
+        assert_eq!(now_, res.updated_at);
+    }
+
+    #[test]
+    fn get_one_before_update() {
+        // 接続
+        dotenv().ok();
+        let db_url = var("DATABASE_URL").expect("failed to load DATABASE_URL");
+
+        let manager = ConnectionManager::<PgConnection>::new(db_url);
+        let pool: db::Pool = r2d2::Pool::builder()
+            .build(manager)
+            .expect("failed to create pool");
+
+        let now_ = DateTime::parse_from_rfc3339(&TEST_CREATED_AT).unwrap().with_timezone(&Utc);
+        let acc = get_single_account(pool.clone(), TEST_USER_ID.to_string()).expect("failed to get account");
+
+        assert_eq!(TEST_USER_ID.to_string(), acc.id);
+        assert_eq!(TEST_EMAIL.to_string(), acc.email);
+        assert_eq!(None, acc.username);
+        assert_eq!(now_, acc.created_at);
+        assert_eq!(now_, acc.updated_at);
+    }
+
+    #[test]
+    fn update_one() {
+        // 接続
+        dotenv().ok();
+        let db_url = var("DATABASE_URL").expect("failed to load DATABASE_URL");
+
+        let manager = ConnectionManager::<PgConnection>::new(db_url);
+        let pool: db::Pool = r2d2::Pool::builder()
+            .build(manager)
+            .expect("failed to create pool");
+
+        let now_ = DateTime::parse_from_rfc3339(&TEST_UPDATED_AT).unwrap().with_timezone(&Utc);
+        set_mock_time(now_);
+
+        let res = update_single_account(pool.clone(), TEST_USER_ID.to_string(),
+                                        InputUpdateAccount{ email: None, username: Some(&TEST_USER_NAME.to_string()) }).expect("failed to update account");
+
+        assert_eq!(TEST_USER_ID.to_string(), res.id);
+        assert_eq!(TEST_EMAIL.to_string(), res.email);
+        assert_eq!(TEST_USER_NAME.to_string(), res.username.unwrap());
+        assert_eq!(DateTime::parse_from_rfc3339(&TEST_CREATED_AT).unwrap().with_timezone(&Utc), res.created_at);
+        assert_eq!(DateTime::parse_from_rfc3339(&TEST_UPDATED_AT).unwrap().with_timezone(&Utc), res.updated_at);
+
+    }
+
+    #[test]
+    fn get_one_after_update() {
+        // 接続
+        dotenv().ok();
+        let db_url = var("DATABASE_URL").expect("failed to load DATABASE_URL");
+
+        let manager = ConnectionManager::<PgConnection>::new(db_url);
+        let pool: db::Pool = r2d2::Pool::builder()
+            .build(manager)
+            .expect("failed to create pool");
+
+        let acc = get_single_account(pool.clone(), TEST_USER_ID.to_string()).expect("failed to get account");
+
+        assert_eq!(TEST_USER_ID.to_string(), acc.id);
+        assert_eq!(TEST_EMAIL.to_string(), acc.email);
+        assert_eq!(TEST_USER_ID, acc.username.unwrap());
+        assert_eq!(DateTime::parse_from_rfc3339(&TEST_CREATED_AT).unwrap().with_timezone(&Utc) , acc.created_at);
+        assert_eq!(DateTime::parse_from_rfc3339(&TEST_UPDATED_AT).unwrap().with_timezone(&Utc) , acc.updated_at);
+    }
+
+    #[test]
+    fn delete_one() {
+        // 接続
+        dotenv().ok();
+        let db_url = var("DATABASE_URL").expect("failed to load DATABASE_URL");
+
+        let manager = ConnectionManager::<PgConnection>::new(db_url);
+        let pool: db::Pool = r2d2::Pool::builder()
+            .build(manager)
+            .expect("failed to create pool");
+
+        let count = delete_single_account(pool.clone(), TEST_USER_ID.to_string()).expect("failed to delete account");
+        assert_eq!(count, 1);
     }
 }
