@@ -1,3 +1,5 @@
+extern crate core;
+
 use chrono::{DateTime, FixedOffset, Utc};
 use connector::db::{accounts};
 use connector::idgen::{get_new_id, get_new_revision};
@@ -46,25 +48,25 @@ impl SupervisorService for SupervisorServiceProvider {
 
     async fn create_account(&self, request: Request<CreateAccountRequest>) -> Result<Response<CreateAccountReply>, Status> {
         let acc: Account = request.into_inner().account.unwrap();
-        
-        // リクエストに含まれるemailをもつアカウントが存在しないことを確認
-        let accounts_ = get_multiple_account_with_email(
-            self.pool.clone(), acc.email.clone()).unwrap();
-        // 存在している
-        if accounts_.len() >= 1 {
-            Err(Status::already_exists("this email is already used."))?
-        }
-        // todo : usernameが重複してないか。
 
         // id生成
         let user_id = get_new_id().await.unwrap();
         let revision = get_new_revision().await.unwrap();
         
-        let res = insert_single_account(self.pool.clone(), InputInsertAccount {
+        let res = match insert_single_account(self.pool.clone(), InputInsertAccount {
             id: &user_id,
             email: &acc.email,
             username: if acc.username == "" {None} else {Some(&acc.username)},
-        }).expect("failed to create account");
+        }) {
+            Ok(r) => r,
+            Err(diesel::result::Error::DatabaseError(diesel::result::DatabaseErrorKind::UniqueViolation, ..)) => {
+                return Err(Status::already_exists("the user using same email or username already exists"))
+            }
+            Err(e) => {
+                return Err(Status::unknown(format!("{:?}", e)))
+            }
+        };
+
 
         Ok(Response::new(CreateAccountReply{ revision: revision.parse().unwrap(), account: Some(types::Account{
             id: res.id,

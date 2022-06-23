@@ -24,6 +24,8 @@ pub fn get_multiple_account_with_email(pool_clone: Pool, input_email: String) ->
     Ok(accos)
 }
 
+// pub fn get
+
 
 pub fn insert_single_account(pool_clone: Pool, input_account: InputInsertAccount) -> Result<Account, diesel::result::Error> {
     let conn = pool_clone.get().unwrap();
