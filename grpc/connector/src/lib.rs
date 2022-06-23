@@ -1,5 +1,5 @@
 mod idgen;
-mod db;
+pub mod db;
 mod util;
 
 #[macro_use]
