@@ -387,3 +387,101 @@ mod accounts_tests {
         assert_eq!(count, 1);
     }
 }
+
+#[cfg(test)]
+mod operations_tests {
+    use chrono::{DateTime, Utc};
+    use diesel::{PgConnection, r2d2};
+    use diesel::r2d2::{ConnectionManager};
+    use dotenv::{dotenv, var};
+
+    use crate::db;
+    use crate::db::models::{InputInsertAccount, InputInsertOperation, InputUpdateAccount};
+    use crate::db::operations::{delete_single_operations, get_single_operation, insert_single_operation};
+    use crate::util::datetime::mock_time::set_mock_time;
+    use crate::util::datetime::now;
+
+    // pub revision: &'a i64,
+    // pub op_type: &'a i32,
+    // pub source: &'a String,
+    // pub destination: &'a Vec<String>,
+    // pub created_at: &'a DateTime<Utc>,
+    // pub updated_at: &'a DateTime<Utc>,
+
+    static TEST_REVISION: i64 = 12;
+    static TEST_OP_TYPE: i32 = 1;
+    static TEST_SOURCE: &str = "userA";
+    static TEST_DEST_01: &str = "userB";
+    static TEST_DEST_02: &str = "userC";
+
+    static TEST_CREATED_UPDATED_AT: &str = "2020-02-01T00:00:00+00:00";
+
+    #[test]
+    fn insert_one() {
+        // 接続
+        dotenv().ok();
+        let db_url = var("DATABASE_URL").expect("failed to load DATABASE_URL");
+
+        let manager = ConnectionManager::<PgConnection>::new(db_url);
+        let pool: db::Pool = r2d2::Pool::builder()
+            .build(manager)
+            .expect("failed to create pool");
+
+        let new_operation = InputInsertOperation {
+            revision: &TEST_REVISION,
+            op_type: &TEST_OP_TYPE,
+            source: &TEST_SOURCE.to_string(),
+            destination: &vec![TEST_DEST_01.to_string(), TEST_DEST_02.to_string()]
+        };
+
+        // 時間設定
+        let now_ = DateTime::parse_from_rfc3339(&TEST_CREATED_UPDATED_AT).unwrap().with_timezone(&Utc);
+        set_mock_time(now_);
+
+        let res = insert_single_operation(pool.clone(), new_operation).expect("failed to insert operation");
+
+        assert_eq!(TEST_REVISION, res.revision);
+        assert_eq!(TEST_OP_TYPE, res.op_type);
+        assert_eq!(TEST_SOURCE, res.source);
+        assert_eq!(vec![TEST_DEST_01.to_string(), TEST_DEST_02.to_string()], res.destination);
+        assert_eq!(now_, res.created_at);
+        assert_eq!(now_, res.updated_at);
+    }
+
+    #[test]
+    fn get_one() {
+        // 接続
+        dotenv().ok();
+        let db_url = var("DATABASE_URL").expect("failed to load DATABASE_URL");
+
+        let manager = ConnectionManager::<PgConnection>::new(db_url);
+        let pool: db::Pool = r2d2::Pool::builder()
+            .build(manager)
+            .expect("failed to create pool");
+
+        let op = get_single_operation(pool.clone(), TEST_REVISION).expect("failed to get operation");
+
+        let now_ = DateTime::parse_from_rfc3339(&TEST_CREATED_UPDATED_AT).unwrap().with_timezone(&Utc);
+
+        assert_eq!(TEST_REVISION, op.revision);
+        assert_eq!(TEST_OP_TYPE, op.op_type);
+        assert_eq!(TEST_SOURCE, op.source);
+        assert_eq!(vec![TEST_DEST_01.to_string(), TEST_DEST_02.to_string()], op.destination);
+        assert_eq!(now_, op.created_at);
+        assert_eq!(now_, op.updated_at);
+    }
+
+    #[test]
+    fn delete_one() {
+        let db_url = var("DATABASE_URL").expect("failed to load DATABASE_URL");
+
+        let manager = ConnectionManager::<PgConnection>::new(db_url);
+        let pool: db::Pool = r2d2::Pool::builder()
+            .build(manager)
+            .expect("failed to create pool");
+
+        let count = delete_single_operations(pool.clone(), TEST_REVISION).expect("failed to delete operation");
+
+        assert_eq!(count, 1);
+    }
+}
