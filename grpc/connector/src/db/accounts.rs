@@ -1,5 +1,4 @@
-use diesel::{delete, insert_into, QueryDsl, QueryResult, RunQueryDsl, update};
-use diesel::dsl::date;
+use diesel::{delete, insert_into, QueryDsl, RunQueryDsl, update};
 
 use crate::db::models::{Account, InputInsertAccount, InputUpdateAccount, NewAccount, UpdateAccount};
 use crate::db::Pool;
@@ -29,7 +28,7 @@ pub fn insert_single_account(pool_clone: Pool, input_account: InputInsertAccount
 
 pub fn update_single_account(pool_clone: Pool, user_id: String, input_account: InputUpdateAccount) -> Result<Account, diesel::result::Error> {
     let conn = pool_clone.get().unwrap();
-    
+
     let res = update(accounts.find(user_id))
         .set(&UpdateAccount{
             email: input_account.email,
@@ -37,7 +36,7 @@ pub fn update_single_account(pool_clone: Pool, user_id: String, input_account: I
             updated_at: &datetime::now()
         })
         .get_result(&conn).unwrap();
-    
+
     Ok(res)
 }
 

@@ -1,5 +1,4 @@
-use chrono::{DateTime, Datelike, FixedOffset, Utc};
-use std::thread;
+use chrono::{DateTime, Utc};
 
 #[cfg(not(test))]
 pub fn now() -> DateTime<Utc> {

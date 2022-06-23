@@ -1,5 +1,4 @@
-use diesel::{delete, insert_into, QueryDsl, QueryResult, RunQueryDsl, update};
-use diesel::dsl::date;
+use diesel::{delete, insert_into, QueryDsl, RunQueryDsl, update};
 
 use crate::db::models::{InputInsertOperation, NewOperation, Operation};
 use crate::db::Pool;

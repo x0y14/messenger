@@ -1,4 +1,4 @@
-use diesel::{update, delete, insert_into, QueryDsl, RunQueryDsl, QueryResult};
+use diesel::{update, delete, insert_into, QueryDsl, RunQueryDsl};
 
 use crate::db::models::{InputInsertProfile, InputUpdateProfile, NewProfile, Profile, UpdateProfile};
 use crate::db::Pool;
