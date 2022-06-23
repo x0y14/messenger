@@ -60,3 +60,12 @@ create table operations
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+-- friends
+-- create table friends
+-- (
+--     id       varchar(20)         not null
+--         constraint friends_pk
+--             primary key,
+--     user_ids TEXT[] default '{}' not null
+-- );
+
